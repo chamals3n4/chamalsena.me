@@ -2,9 +2,40 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Twitter, Instagram, Linkedin } from "lucide-react";
 import { Button } from "./ui/button";
+import emailjs from "@emailjs/browser";
 
 export function Contact() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
   const [currentTime, setCurrentTime] = useState("");
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const serviceId = import.meta.env.VITE_SERVICE_ID;
+    const templateId = import.meta.env.VITE_TEMPLATE_ID;
+    const publicKey = import.meta.env.VITE_PUBLIC_KEY;
+
+    const templateParams = {
+      from_name: name,
+      from_email: email,
+      to_name: "S3n4",
+      message: message,
+    };
+
+    emailjs
+      .send(serviceId, templateId, templateParams, publicKey)
+      .then((response) => {
+        console.log("Email sent successfully!", response);
+        setName("");
+        setEmail("");
+        setMessage("");
+      })
+      .catch((error) => {
+        console.error("Error sending email:", error);
+      });
+  };
 
   useEffect(() => {
     const updateTime = () => {
@@ -75,11 +106,13 @@ export function Contact() {
             </div>
           </div>
 
-          <form className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <input
                 type="text"
                 placeholder="Your name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 className="w-full px-4 py-3 bg-[#1A1A1A] rounded-lg border border-white/10 focus:border-white/20 focus:outline-none transition-colors"
               />
             </div>
@@ -88,6 +121,8 @@ export function Contact() {
               <input
                 type="email"
                 placeholder="Your Email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-3 bg-[#1A1A1A] rounded-lg border border-white/10 focus:border-white/20 focus:outline-none transition-colors"
               />
             </div>
@@ -96,6 +131,8 @@ export function Contact() {
               <textarea
                 placeholder="Message"
                 rows={6}
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
                 className="w-full px-4 py-3 bg-[#1A1A1A] rounded-lg border border-white/10 focus:border-white/20 focus:outline-none transition-colors resize-none"
               ></textarea>
             </div>
